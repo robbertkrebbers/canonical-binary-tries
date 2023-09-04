@@ -2,6 +2,7 @@ From Coq Require Import List String ZArith POrderedType FMaps FMapAVL.
 From Tries.MMaps Require RBT.
 From Tries Require Import String2pos StringOrder PositiveOrder.
 From Tries Require Original Canonical Sigma Node01 GADT Patricia CharTrie.
+From stdpp Require Import pmap gmap.
 
 Local Open Scope string_scope.
 Local Open Scope list_scope.
@@ -102,6 +103,28 @@ Module TestNode01 := Test Node01.PTree.
 Module TestGADT := Test GADT.PTree.
 Module TestPatricia := Test Patricia.PTree.
 
+(* Testing std++ pmap *)
+
+Module Pmap <: BINARY_TRIE.
+  Definition t := Pmap.
+  Definition empty A : t A := ∅.
+  Definition get A : positive → t A → _ := lookup.
+  Definition set A : positive → _ → t A → t A := insert.
+End Pmap.
+
+Module TestPmap := Test Pmap.
+
+(* Testing std++ gmap with positives as keys *)
+
+Module Gmap <: BINARY_TRIE.
+  Definition t := gmap positive.
+  Definition empty A : t A := ∅.
+  Definition get A : positive → t A → _ := lookup.
+  Definition set A : positive → _ → t A → t A := insert.
+End Gmap.
+
+Module TestGmap := Test Gmap.
+
 (* Testing AVL maps with positives as keys *)
 
 Module PositiveAVL := FMapAVL.Make OrderedPositive.
@@ -127,6 +150,17 @@ Module PositiveRBTree <: BINARY_TRIE.
 End PositiveRBTree.
 
 Module TestRBPositive := Test PositiveRBTree.
+
+(* Testing std++ gmap with strings as keys *)
+
+Module TestGmapString.
+Definition bench1 (l: list string) : bool :=
+  benchgen ∅ (insert (M:=gmap string unit)) lookup l.
+
+Definition dsize (l: list string) :=
+  dsizegen ∅ (insert (M:=gmap string unit)) l.
+
+End TestGmapString.
 
 (* Testing AVL maps with strings as keys *)
 
